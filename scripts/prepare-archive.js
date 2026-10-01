@@ -10,32 +10,38 @@ const tmp = dest + '.tmp';
 const archiveUrl = String(process.env.ARCHIVE_URL || '').trim();
 const explicitArchivePath = String(process.env.ARCHIVE_ZST_PATH || '').trim();
 
-// Hostinger Git deployments are built under:
-// <domain>/hbuilds/source/repository
-// Keep the large archive outside deployments in:
-// <domain>/public_html/nawafith-data/nawafith_internal.sqlite3.zst
-const hostingerPersistentArchive = path.resolve(
-  root,
-  '..', '..', '..',
-  'public_html', 'nawafith-data', 'nawafith_internal.sqlite3.zst'
-);
+function findHostingerPersistentArchive(startDir) {
+  let cur = path.resolve(startDir);
+  for (let i = 0; i < 10; i++) {
+    if (path.basename(cur) === 'hbuilds') {
+      const domainRoot = path.dirname(cur);
+      return path.join(domainRoot, 'public_html', 'nawafith-data', 'nawafith_internal.sqlite3.zst');
+    }
+    const parent = path.dirname(cur);
+    if (parent === cur) break;
+    cur = parent;
+  }
+  return null;
+}
 
 async function main() {
   fs.mkdirSync(dataDir, { recursive: true });
 
   if (fs.existsSync(dest) && fs.statSync(dest).size > 100 * 1024 * 1024) {
-    console.log('Archive database already prepared.');
+    console.log(`Archive database already prepared: ${dest}`);
     return;
   }
 
+  const hostingerPersistentArchive = findHostingerPersistentArchive(root);
   let sourceFile = null;
+
   if (fs.existsSync(src)) {
     sourceFile = src;
     console.log(`Using bundled archive: ${src}`);
   } else if (explicitArchivePath && fs.existsSync(explicitArchivePath)) {
     sourceFile = explicitArchivePath;
     console.log(`Using ARCHIVE_ZST_PATH: ${explicitArchivePath}`);
-  } else if (fs.existsSync(hostingerPersistentArchive)) {
+  } else if (hostingerPersistentArchive && fs.existsSync(hostingerPersistentArchive)) {
     sourceFile = hostingerPersistentArchive;
     console.log(`Using Hostinger persistent archive: ${hostingerPersistentArchive}`);
   }
@@ -50,8 +56,12 @@ async function main() {
   }
 
   if (!sourceFile) {
-    console.warn('Archive file is not present. Expected bundled data file, ARCHIVE_ZST_PATH, Hostinger public_html/nawafith-data, or ARCHIVE_URL.');
-    return;
+    console.error('Archive file was not found.');
+    console.error(`Runtime root: ${root}`);
+    console.error(`Checked bundled: ${src}`);
+    console.error(`Checked Hostinger persistent: ${hostingerPersistentArchive || 'not detected'}`);
+    console.error('You can also set ARCHIVE_ZST_PATH or ARCHIVE_URL.');
+    process.exit(2);
   }
 
   console.log(`Decompressing archive database from: ${sourceFile}`);
@@ -64,6 +74,6 @@ async function main() {
 }
 
 main().catch(err => {
-  console.error(err);
+  console.error('Archive preparation failed:', err);
   process.exit(1);
 });
