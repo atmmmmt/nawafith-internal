@@ -1,0 +1,27 @@
+{
+  "name": "nawafith-internal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Private internal searchable archive for Nawafith",
+  "main": "server.js",
+  "type": "commonjs",
+  "engines": { "node": ">=22 <23" },
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node scripts/check.js",
+    "prepare-archive": "node scripts/prepare-archive.js",
+    "postinstall": "node scripts/prepare-archive.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "better-sqlite3": "^12.4.1",
+    "compression": "^1.8.1",
+    "cookie-session": "^2.1.1",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "fzstd": "0.1.1",
+    "helmet": "^8.1.0",
+    "mysql2": "^3.15.2"
+  }
+}
