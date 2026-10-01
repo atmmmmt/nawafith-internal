@@ -1,16 +1,16 @@
 {
   "name": "nawafith-internal",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "Private internal searchable archive for Nawafith",
   "main": "server.js",
   "type": "commonjs",
   "engines": { "node": ">=22.18 <23" },
   "scripts": {
-    "start": "node server.js",
+    "start": "node scripts/prepare-archive.js && node server.js",
     "check": "node --check server.js && node scripts/sqlite-compat-check.js && node scripts/check.js",
     "prepare-archive": "node scripts/prepare-archive.js",
-    "postinstall": "node scripts/prepare-archive.js"
+    "postinstall": "node scripts/prepare-archive.js || true"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
