@@ -1,0 +1,8 @@
+{
+  "name": "better-sqlite3",
+  "version": "0.0.0-node22-compat",
+  "private": true,
+  "main": "index.js",
+  "type": "commonjs",
+  "engines": { "node": ">=22.18 <23" }
+}
