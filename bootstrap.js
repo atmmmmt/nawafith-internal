@@ -25,10 +25,12 @@ function candidates() {
 
   const home = process.env.HOME;
   if (home) {
+    add(path.join(home, 'nawafith-data', FILE));
     add(path.join(home, 'public_html', 'nawafith-data', FILE));
     const domains = path.join(home, 'domains');
     try {
       for (const name of fs.readdirSync(domains)) {
+        add(path.join(domains, name, 'nawafith-data', FILE));
         add(path.join(domains, name, 'public_html', 'nawafith-data', FILE));
       }
     } catch (_) {}
@@ -52,6 +54,7 @@ function diagnostic(reason) {
   const payload = {
     ok: false,
     bootstrap: true,
+    version: '2.0',
     node: process.version,
     cwd: process.cwd(),
     dirname: __dirname,
@@ -67,7 +70,7 @@ function diagnostic(reason) {
 }
 
 if (!found) {
-  diagnostic('Archive SQLite file not found. Extract nawafith_internal.sqlite3 under public_html/nawafith-data.');
+  diagnostic('Archive SQLite file not found. Keep nawafith_internal.sqlite3 in a persistent folder and set NAWAFITH_ARCHIVE_DB.');
 } else {
   process.env.NAWAFITH_ARCHIVE_DB = found.path;
   if (!process.env.LOCAL_STATE_DB) {
@@ -76,9 +79,9 @@ if (!found) {
   console.log('Bootstrap archive:', found.path, found.size);
   console.log('Bootstrap state:', process.env.LOCAL_STATE_DB);
   try {
-    require('./server.js');
+    require('./server-v2.js');
   } catch (err) {
-    console.error('Server bootstrap failed:', err);
-    diagnostic(`Server bootstrap failed: ${err && err.message ? err.message : String(err)}`);
+    console.error('Nawafith V2 bootstrap failed:', err);
+    diagnostic(`Nawafith V2 bootstrap failed: ${err && err.message ? err.message : String(err)}`);
   }
 }
