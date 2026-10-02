@@ -1,6 +1,6 @@
 {
   "name": "nawafith-internal",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "private": true,
   "description": "Private internal searchable archive for Nawafith",
   "main": "bootstrap.js",
@@ -8,7 +8,7 @@
   "engines": { "node": ">=22.18 <23" },
   "scripts": {
     "start": "node bootstrap.js",
-    "check": "node --check bootstrap.js && node --check server.js && node scripts/sqlite-compat-check.js && node scripts/check.js",
+    "check": "node --check bootstrap.js && node --check server-v2.js && node scripts/v2-syntax-check.js && node scripts/sqlite-compat-check.js && node scripts/check.js",
     "prepare-archive": "node scripts/prepare-archive.js"
   },
   "dependencies": {
